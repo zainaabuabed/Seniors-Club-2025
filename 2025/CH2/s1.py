@@ -13,3 +13,4 @@ robot.Car_Back(70, 70)
 time.sleep(5)
 
 robot.Car_Stop()
+del robot
