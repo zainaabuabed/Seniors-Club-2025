@@ -28,3 +28,4 @@ robot.Car_Run(60, 60)
 time.sleep(2)
 
 robot.Car_Stop()
+del car
