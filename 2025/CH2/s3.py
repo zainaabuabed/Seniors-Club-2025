@@ -46,11 +46,11 @@ try:
     robot.Car_Stop()
 
 except KeyboardInterrupt:
-    del robot
+   
     robot.Car_Stop()
-    
-finally:
-    del robot
+     del robot  
+finally: 
     robot.Car_Stop()
+    del robot
 
     
