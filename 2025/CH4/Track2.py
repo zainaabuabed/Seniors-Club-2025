@@ -9,10 +9,10 @@ left2Sensor = 22
 right1Sensor = 17  
 right2Sensor = 4
 
-direction =0 # 0=> forward   1 => backward
-must_end=0     # 0=>keep going  1=> must end path
-go_to_fire=0
-go_to_Tank=1
+direction =False  # False => forward   True => backward
+must_end=False    # False =>keep going  True=> must end path
+go_to_fire=False  # False=> still not go to fire True => go to fire location
+go_to_Tank=True   # False => not go to tank  True => go to tank location
 
 def Hardware_Setup():
     GPIO.setmode(GPIO.BCM)
@@ -22,6 +22,22 @@ def Hardware_Setup():
     GPIO.setup(left2Sensor,GPIO.IN)
     GPIO.setup(right1Sensor,GPIO.IN)
     GPIO.setup(right2Sensor,GPIO.IN)
+
+def Spin_Counter_Clockwise(straightTime=1,spinTime=1,taskDuration=5):
+    myCar.Car_Stop()
+    time.sleep(taskDuration)  #stimulate task
+    myCar.Car_Run(50, 50)
+    time.sleep(straightTime)
+    myCar.Car_Stop()
+    myCar.Car_Spin_Left(70, 70)
+    time.sleep(spinTime)
+
+def Spin_Clockwise(straightTime=1,spinTime=1):
+    myCar.Car_Run(50, 50)
+    time.sleep(straightTime)
+    myCar.Car_Stop()
+    myCar.Car_Spin_Right(70, 70)
+    time.sleep(spinTime)
     
 def Read_Sensors():
     l1 = GPIO.input(left1Sensor) # left 1 sensor value
@@ -30,7 +46,7 @@ def Read_Sensors():
     r2 = GPIO.input(right2Sensor) # right 2 sensor value
     return[l1,l2,r1,r2]
 
-def Go_To_Tank():
+def Fire_Mission():
     Sensors_Values=Read_Sensors()
     l1 = Sensors_Values[0]
     l2= Sensors_Values[1]
@@ -53,67 +69,48 @@ def Go_To_Tank():
         time.sleep(0.02)
     
     # 0 0 0 1      Handle the cross while direction is forward
-    elif l1==False and l2==False and r1==False and r2==True and direction==0:
-        must_end=0
+    elif l1==False and l2==False and r1==False and r2==True and direction==False:
+        must_end=False
         print("Keep tracking => cross forward")
 
     # 1 0 0 0     Handle the cross while direction is back
-    elif l1==True and l2==False and r1==False and r2==False and go_to_Tank==0 and direction ==0:
+    elif l1==True and l2==False and r1==False and r2==False and go_to_Tank==False and direction ==False:
         myCar.Car_Spin_Right(70, 70)
         time.sleep(0.02)
-        go_to_fire=1
+        go_to_fire=True
         print("go to fire")
     
     # 0 0 0 0 handle all sensors inline
     elif l1==False and l2==False and r1==False and r2==False:
         if(direction==0 and go_to_Tank==1):
             print("Tank is full :)") 
-            go_to_Tank=0
-            go_to_fire=1   #extra
+            go_to_Tank=False
+            go_to_fire=True   #extra
             Spin_Counter_Clockwise(0.9,1,2) #straightTime=1.1 , spinTime=1
-        elif(direction==0 and go_to_Tank==0 and go_to_fire==1):
+        elif(direction==False and go_to_Tank==False and go_to_fire==True):
             print("Fire is off") 
             print("Back to fire station") 
             Spin_Counter_Clockwise(0.9,1,2)
-            direction=1
-        elif direction==1:
+            direction=True
+        elif direction==True:
             print("Near fire station => last Turn") 
             Spin_Clockwise(0.5,0.65)
-            must_end=1
+            must_end=True
                    
-
     # 1 0 0 1 Processing straight lines        
     elif l1==True and l2==False and r1==False and r2==True:
 	    myCar.Car_Run(50, 50) 
     
     # 1 1 1 1 handle all white => end of path
-    elif l1==True and l2==True and r1==True and r2==True and direction==1:
-        if(must_end==1):
+    elif l1==True and l2==True and r1==True and r2==True and direction==True:
+        if(must_end==True):
             Spin_Counter_Clockwise(1.35,1.2) #straightTime=1.2 , spinTime=1.2
             return 0
-
-def Spin_Counter_Clockwise(straightTime=1,spinTime=1,taskDuration=5):
-    myCar.Car_Stop()
-    time.sleep(taskDuration)  #stimulate task
-    myCar.Car_Run(50, 50)
-    time.sleep(straightTime)
-    myCar.Car_Stop()
-    myCar.Car_Spin_Left(70, 70)
-    time.sleep(spinTime)
-
-def Spin_Clockwise(straightTime=1,spinTime=1):
-    myCar.Car_Run(50, 50)
-    time.sleep(straightTime)
-    myCar.Car_Stop()
-    myCar.Car_Spin_Right(70, 70)
-    time.sleep(spinTime)
-   
-
 
 Hardware_Setup()
 try:
     while True:   
-        End_Of_Path=Go_To_Tank()
+        End_Of_Path=Fire_Mission()
         if End_Of_Path==0:
             print("Mission Finished")
             break
