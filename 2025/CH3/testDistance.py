@@ -11,5 +11,6 @@ except KeyboardInterrupt:
 finally:
     print("IO cleaned")
     ultrasonic.close()
+    del ultrasonic
 
 
