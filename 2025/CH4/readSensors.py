@@ -24,13 +24,14 @@ def read_Sensors():
 
 
 try:
+    hardware_Setup()
     while True:
-        hardware_Setup()
-        Sensors_Values=read_Sensors()
-        print (Sensors_Values)
+        sensorsValues=read_Sensors()
+        print (sensorsValues)
         time.sleep(2)
 except KeyboardInterrupt:
     pass
 finally:
     GPIO.cleanup()
+
     
