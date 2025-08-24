@@ -84,8 +84,9 @@ def Go_To_Tank():
 
 
 
-Hardware_Setup()
+
 try:
+	Hardware_Setup()
     while True:   
         End_Of_Path=Go_To_Tank()
         if End_Of_Path==0:
@@ -97,4 +98,5 @@ except KeyboardInterrupt:
 finally:
     GPIO.cleanup()
     myCar.Car_Stop() 
+	del myCar
     
