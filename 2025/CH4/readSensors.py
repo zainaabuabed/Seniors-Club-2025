@@ -26,12 +26,12 @@ def read_Sensors():
 try:
     hardware_Setup()
     while True:
-        sensorsValues=read_Sensors()
-        print (sensorsValues)
+        print (read_Sensors())
         time.sleep(2)
 except KeyboardInterrupt:
-    pass
+    print("Finished")
 finally:
     GPIO.cleanup()
 
     
+
